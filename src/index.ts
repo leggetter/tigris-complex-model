@@ -1,6 +1,5 @@
 import { Tigris } from "@tigrisdata/core";
-import { User } from "./db/models/user";
-import { Post } from "./db/models/post";
+import { Project, WeeklySchedule } from "./db/models/project";
 
 async function main() {
   // setup client
@@ -8,7 +7,38 @@ async function main() {
   // ensure branch exists, create it if it needs to be created dynamically
   await tigrisClient.getDatabase().initializeBranch();
   // register schemas
-  await tigrisClient.registerSchemas([User, Post]);
+  await tigrisClient.registerSchemas([Project]);
+
+  const projectsCollection = tigrisClient.getDatabase().getCollection<Project>(Project);
+
+  const monday = [
+    {
+      tasks: [
+        "wake up",
+        "get out of bed",
+        "drag a comb across my head",
+      ]
+    }
+  ];
+  const tuesday = [
+    {
+      tasks: [
+        "wake up",
+        "get out of bed",
+        "drag a comb across my head",
+        "Find way downstairs and drink a cup",
+      ]
+    }
+  ];
+  const week1: WeeklySchedule = {
+    days: [monday, tuesday]
+  }
+
+  const insertedWeek1 = projectsCollection.insertOne({
+    schedules: [week1]
+  });
+
+  console.log(JSON.stringify(insertedWeek1, null, 2));
 }
 
 main()
